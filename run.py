@@ -1,5 +1,7 @@
 # -*- coding:utf-8 -*-
 
+debug = True
+
 import io
 from collections import defaultdict
 from mine import *
@@ -14,14 +16,14 @@ import api_motion
 class Cfg(object):
   def __init__(self):
     # self.MidiFile = r'E:\minecraft 1.12.2\.minecraft\saves\CopyNinjaKaKaXi\data\functions\mid\test.mid'
-    # self.MidiFile = r'E:\minecraft 1.12.2\.minecraft\saves\CopyNinjaKaKaXi\data\functions\mid\S1.mid'
+    self.MidiFile = r'E:\minecraft 1.12.2\.minecraft\saves\CopyNinjaKaKaXi\data\functions\mid\S1.mid'
     # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\小苹果.mid'
     # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\Lemon.mid'
     # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\梁祝完整版.mid'
-    self.MidiFile = r'./mid/梦回还 - 狐妖小红娘王权篇OP.mid'
+    # self.MidiFile = r'./mid/梦回还 - 狐妖小红娘王权篇OP.mid'
     self.RootPos  = Vec3( 32,32,0 )
-    self.tickrate = 20.0
-    self.maxfb    = 64
+    self.tickrate = 60.0
+    self.maxfb    = 8
 
 
 
@@ -86,7 +88,7 @@ class FackMc(object):
       Log(f'[ERROR]:vx, vy, vz too large [{vx}, {vy}, {vz}]')
       return
     else:
-      _Time  = 600 - tick - 1
+      _Time  = 600 - ( tick - 2 )
       if _Time < 1:
         Log(f'[Warning]:_Time < 1, _Time:{_Time}, now _Time = 1')
         _Time = 1
@@ -96,12 +98,13 @@ class FackMc(object):
         self.falling_block_list = [ i for i in self.falling_block_list if i > curTime ]
         if len(self.falling_block_list) < self.maxfb:
           self.falling_block_list.append( curTime + tick/tickrate )
-          Log( f'summon falling_block {x} {y} {z} {{Motion:[{vx},{vy},{vz}],Time:{_Time},DropItem:0b,Block:"{block}",Data:{data},NoGravity:1b}}' )
+          # Log( f'summon falling_block {x} {y} {z} {{Motion:[{vx},{vy},{vz}],Time:{_Time},DropItem:0b,Block:"{block}",Data:{data},NoGravity:1b}}' )
           # _NoGravity = 0 if gravity else 1
           mc.spawnEntity( 'FallingSand', x, y, z, f'{{NoGravity:1b,Motion:[{vx},{vy},{vz}],Time:{_Time},DropItem:0b,Block:"{block}",Data:{data}}}' )
         else:
-          Log( f'[ERROR]:falling_block_list is full' )
+          # Log( f'[ERROR]:falling_block_list is full' )
         # Log( f'summon falling_block {x} {y} {z} {{Motion:[{vx},{vy},{vz}],Time:{_Time},DropItem:0b,Block:"{block}",Data:{data}}}' )
+          pass
       except:
         pass
 
@@ -347,102 +350,106 @@ if __name__ == '__main__':
     def callback(self):
       fackMc.fallingblock( *self.p0, *self.p1, self.fT, self.block, self.data )
 
+  with open('output.txt', 'w') as f:
+
+    _TweenList = []
+    timer = 0
+    for fixMsg in fixMsgList:
+      msg = fixMsg.rawMsg
+      timer += msg.time
+      if msg.type == 'note_on' and msg.velocity > 0:
+        if fixMsg.length != None and int( fixMsg.length*tickrate ) > 0:
+          tick   = int( fixMsg.length*tickrate )
+          x,y,z  = p.getKeyPos( msg.note, msg.channel )
+          x     += 2
+          if len(fixMsg.move) == 0:
+            pass
+          else:
+            _startTick = 0
+            _endTick   = tick
+            _lastDn    = 0
+            moveDict = {}
+            moveDict[_startTick] = 0.0
+
+            for m in fixMsg.move:
+              moveDict[int(round(m.dt*tickrate))] = m.dn
+              _lastDn                             = m.dn
+            if not _endTick in moveDict:
+              moveDict[_endTick] = _lastDn
+
+            fixMoveList = []
+            for t in range( _startTick, _endTick+1 ):
+              if t in moveDict:
+                fixMoveList.append( moveItem( t, moveDict[t] ) )
+
+            f.write( '--newFixMoveList:' + '\n')
+            for i, m in enumerate(fixMoveList):
+              f.write( f't:{m.dt}, dn={m.dn}' + '\n' )
+
+            motion = FB.getMotionBy2PWithT( x,y,z, x,y,z, tick, gravity=False )
+            # vx,vy,vz = motion
+            # if ( abs(vx) >= 10.0 or abs(vy) >= 10.0 or abs(vz) >=10.0 ):
+            #   Log(f'vx, vy, vz too large [{vx}, {vy}, {vz}]')
+            # else:
+            #   _Time  = 600 - tick - 1
+            #   if _Time < 1:
+            #     Log(f'_Time < 1, _Time:{_Time}')
+            #   else:
+            #     mc.spawnEntity( 'falling_block', x+0.5, y+0.5, z+0.5, f'{{Motion:[{vx},{vy},{vz}],Time:{_Time},DropItem:0b,Block:"{block}",Data:{data}}}' )
 
 
-  _TweenList = []
-  timer = 0
-  for fixMsg in fixMsgList:
-    msg = fixMsg.rawMsg
-    timer += msg.time
-    if msg.type == 'note_on' and msg.velocity > 0:
-      if fixMsg.length != None and int( fixMsg.length*tickrate ) > 0:
-        tick   = int( fixMsg.length*tickrate )
-        x,y,z  = p.getKeyPos( msg.note, msg.channel )
-        x     += 2
-        if len(fixMsg.move) == 0:
-          pass
-        else:
-          _startTick = 0
-          _endTick   = tick
-          _lastDn    = 0
-          moveDict = {}
-          moveDict[_startTick] = 0.0
+            for i,m in enumerate(fixMoveList):
+              # 这是最后一项
+              if i == len(fixMoveList)-1:
+                # if msg.length > m[0]:
+                #   m0 = m
+                #   m1 = m
+                #   sTick = tick + m0[0]
+                #   eTick = tick + msg.length
+                #   sNote = note + m0[1]
+                #   eNote = note + m1[1]
+                #   fT    = eTick - sTick
+                #   lastNote = eNote
+                # else:
+                #   break
+                pass
 
-          for m in fixMsg.move:
-            moveDict[ceil(m.dt*tickrate)] = m.dn
-            _lastDn                       = m.dn
-          if not _endTick in moveDict:
-            moveDict[_endTick] = _lastDn
+              # 这不是最后一项
+              else:
+                m0 = m
+                m1 = fixMoveList[i+1]
+                sTick = m0.dt
+                eTick = m1.dt
+                sNote = m0.dn + msg.note
+                eNote = m1.dn + msg.note
+                fT    = eTick - sTick
+                # lastNote = eNote
 
-          fixMoveList = []
-          for t in range( _startTick, _endTick+1 ):
-            if t in moveDict:
-              fixMoveList.append( moveItem( t, moveDict[t] ) )
+              # p0 = getPos(sTick, sNote, velocity, channel)
+              # p1 = getPos(eTick, eNote, velocity, channel)
+                
+              if fT > 0:
+                z0 = p.getKeyPos( sNote, msg.channel )[2]
+                z1 = p.getKeyPos( eNote, msg.channel )[2]
 
-          motion = FB.getMotionBy2PWithT( x,y,z, x,y,z, tick, gravity=False )
-          # vx,vy,vz = motion
-          # if ( abs(vx) >= 10.0 or abs(vy) >= 10.0 or abs(vz) >=10.0 ):
-          #   Log(f'vx, vy, vz too large [{vx}, {vy}, {vz}]')
-          # else:
-          #   _Time  = 600 - tick - 1
-          #   if _Time < 1:
-          #     Log(f'_Time < 1, _Time:{_Time}')
-          #   else:
-          #     mc.spawnEntity( 'falling_block', x+0.5, y+0.5, z+0.5, f'{{Motion:[{vx},{vy},{vz}],Time:{_Time},DropItem:0b,Block:"{block}",Data:{data}}}' )
+                # motion = FB.getMotionBy2PWithT( x,y,z, x,y,z, tick, gravity=True )
 
+                # maxHeight = 8.0
+                # for reTick, cmd in FB.getHushCmdsBy2PWithT(*p0, *p1, fT, maxHeight+p0[1], 'wool', channel%14 + 1):
+                #   seq.findByTick(sTick+reTick).addCmd(cmd)##
+                # # pass
+                p0 = FB.getPosBy1PWithV0( x,y,z, *motion, sTick, gravity=False )
+                p1 = FB.getPosBy1PWithV0( x,y,z, *motion, eTick, gravity=False )
+                p0 = (p0[0]-0.5, p0[1]+3.5, z0+0.5)
+                p1 = (p1[0]-0.5, p1[1]+3.5, z1+0.5)
 
-          for i,m in enumerate(fixMoveList):
-            # 这是最后一项
-            if i == len(fixMoveList)-1:
-              # if msg.length > m[0]:
-              #   m0 = m
-              #   m1 = m
-              #   sTick = tick + m0[0]
-              #   eTick = tick + msg.length
-              #   sNote = note + m0[1]
-              #   eNote = note + m1[1]
-              #   fT    = eTick - sTick
-              #   lastNote = eNote
-              # else:
-              #   break
-              pass
-
-            # 这不是最后一项
-            else:
-              m0 = m
-              m1 = fixMoveList[i+1]
-              sTick = m0.dt
-              eTick = m1.dt
-              sNote = m0.dn + msg.note
-              eNote = m1.dn + msg.note
-              fT    = eTick - sTick
-              # lastNote = eNote
-
-            # p0 = getPos(sTick, sNote, velocity, channel)
-            # p1 = getPos(eTick, eNote, velocity, channel)
               
-            if fT > 0:
-              z0 = p.getKeyPos( sNote, msg.channel )[2]
-              z1 = p.getKeyPos( eNote, msg.channel )[2]
+                # def getFallingBlockFunction( p0, p1, fT, block, data=0 ):
+                #   def fun():
+                #     fackMc.fallingblock( *p0, *p1, fT, block, data=0 )
+                #   return fun
 
-              # motion = FB.getMotionBy2PWithT( x,y,z, x,y,z, tick, gravity=True )
-
-              # maxHeight = 8.0
-              # for reTick, cmd in FB.getHushCmdsBy2PWithT(*p0, *p1, fT, maxHeight+p0[1], 'wool', channel%14 + 1):
-              #   seq.findByTick(sTick+reTick).addCmd(cmd)##
-              # # pass
-              p0 = FB.getPosBy1PWithV0( x,y,z, *motion, sTick, gravity=False )
-              p1 = FB.getPosBy1PWithV0( x,y,z, *motion, eTick, gravity=False )
-              p0 = (p0[0]-0.5, p0[1]+3.5, z0+0.5)
-              p1 = (p1[0]-0.5, p1[1]+3.5, z1+0.5)
-
-            
-              # def getFallingBlockFunction( p0, p1, fT, block, data=0 ):
-              #   def fun():
-              #     fackMc.fallingblock( *p0, *p1, fT, block, data=0 )
-              #   return fun
-
-              _TweenList.append( TweenItem( timer + sTick / tickrate,  p0, p1, fT, 'wool', msg.channel % 14 + 1 ) ) 
+                _TweenList.append( TweenItem( timer + sTick / tickrate,  p0, p1, fT, 'wool', msg.channel % 14 + 1 ) ) 
 
   _TweenList.sort( key=lambda item: item.remainTime )
 
