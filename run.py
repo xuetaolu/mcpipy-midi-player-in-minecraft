@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-debug = True
+# debug = True
 
 import io
 from collections import defaultdict
@@ -15,14 +15,16 @@ import api_motion
 # Custom Setting Here
 class Cfg(object):
   def __init__(self):
+
     # self.MidiFile = r'E:\minecraft 1.12.2\.minecraft\saves\CopyNinjaKaKaXi\data\functions\mid\test.mid'
-    self.MidiFile = r'E:\minecraft 1.12.2\.minecraft\saves\CopyNinjaKaKaXi\data\functions\mid\S1.mid'
+    # self.MidiFile = r'E:\minecraft 1.12.2\.minecraft\saves\CopyNinjaKaKaXi\data\functions\mid\S1.mid'
     # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\小苹果.mid'
     # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\Lemon.mid'
     # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\梁祝完整版.mid'
     # self.MidiFile = r'./mid/梦回还 - 狐妖小红娘王权篇OP.mid'
+    self.MidiFile = r'C:\Users\Administrator\Desktop\msDownload\2019-5-11\东方系列神组曲.mid'
     self.RootPos  = Vec3( 32,32,0 )
-    self.tickrate = 60.0
+    self.tickrate = 20
     self.maxfb    = 8
 
 
@@ -88,7 +90,7 @@ class FackMc(object):
       Log(f'[ERROR]:vx, vy, vz too large [{vx}, {vy}, {vz}]')
       return
     else:
-      _Time  = 600 - ( tick - 2 )
+      _Time  = 600 - ( tick - 1 )
       if _Time < 1:
         Log(f'[Warning]:_Time < 1, _Time:{_Time}, now _Time = 1')
         _Time = 1
@@ -98,7 +100,7 @@ class FackMc(object):
         self.falling_block_list = [ i for i in self.falling_block_list if i > curTime ]
         if len(self.falling_block_list) < self.maxfb:
           self.falling_block_list.append( curTime + tick/tickrate )
-          # Log( f'summon falling_block {x} {y} {z} {{Motion:[{vx},{vy},{vz}],Time:{_Time},DropItem:0b,Block:"{block}",Data:{data},NoGravity:1b}}' )
+          Log( f'summon falling_block {x} {y} {z} {{Motion:[{vx},{vy},{vz}],Time:{_Time},DropItem:0b,Block:"{block}",Data:{data},NoGravity:1b}}' )
           # _NoGravity = 0 if gravity else 1
           mc.spawnEntity( 'FallingSand', x, y, z, f'{{NoGravity:1b,Motion:[{vx},{vy},{vz}],Time:{_Time},DropItem:0b,Block:"{block}",Data:{data}}}' )
         else:
