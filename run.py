@@ -1,9 +1,8 @@
-#_*_ utf-8 encoding 
+# -*- coding:utf-8 -*-
 
 import io
 from collections import defaultdict
 from mine import *
-from board2d import Board2D
 import mido
 import time
 from fallingEntity import FallingBlock
@@ -14,10 +13,11 @@ import api_motion
 # Custom Setting Here
 class Cfg(object):
   def __init__(self):
-    # self.MidiFile = r'E:\minecraft 1.12.2\.minecraft\saves\CopyNinjaKaKaXi\data\functions\mid\S1.mid'
+    self.MidiFile = r'E:\minecraft 1.12.2\.minecraft\saves\CopyNinjaKaKaXi\data\functions\mid\test.mid'
     # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\【黑乐谱】圆周率.mid'
     # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\In the hall of the mountain king FINAL.mid'
-    self.MidiFile = r'C:\Users\dell\Desktop\膝盖\梁祝完整版.mid'
+    # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\梁祝完整版.mid'
+    # self.MidiFile = r'./mid/梦回还 - 狐妖小红娘王权篇OP.mid'
     self.RootPos  = Vec3( 32,32,0 )
     self.tickrate = 20.0
     self.maxfb    = 64
@@ -536,12 +536,14 @@ if __name__ == '__main__':
 
 
     if msgIndex >= len(fixMsgList) and tweenIndex >= len(_TweenList):
+      Log("--- End ---")
+      Log("[xue]: This is builded with mcpipy")
       time.sleep(3)
       break
     
   
-  Log("--- End ---")
-  Log("[xue]: This is builded with mcpipy")
+  # Log("--- End ---")
+  # Log("---  ---")
   # Log("~~结束啦啦啦~~谢谢观看啦啦啦啦啦~~~~~~")
 
   # fackMc.fill( 0,4,-1, 0,4,3, 'STAIRS_WOOD', 3, 'dirt', 0 )
