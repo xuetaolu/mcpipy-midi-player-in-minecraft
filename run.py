@@ -14,10 +14,11 @@ import api_motion
 class Cfg(object):
   def __init__(self):
     # self.MidiFile = r'E:\minecraft 1.12.2\.minecraft\saves\CopyNinjaKaKaXi\data\functions\mid\test.mid'
-    self.MidiFile = r'C:\Users\dell\Desktop\膝盖\小苹果.mid'
+    # self.MidiFile = r'E:\minecraft 1.12.2\.minecraft\saves\CopyNinjaKaKaXi\data\functions\mid\S1.mid'
+    # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\小苹果.mid'
     # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\Lemon.mid'
     # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\梁祝完整版.mid'
-    # self.MidiFile = r'./mid/梦回还 - 狐妖小红娘王权篇OP.mid'
+    self.MidiFile = r'./mid/梦回还 - 狐妖小红娘王权篇OP.mid'
     self.RootPos  = Vec3( 32,32,0 )
     self.tickrate = 20.0
     self.maxfb    = 64
@@ -533,8 +534,8 @@ if __name__ == '__main__':
     if ( tweenIndex < len(_TweenList) and curTime >= _TweenList[tweenIndex].remainTime ):
       _TweenList[tweenIndex].callback()
       tweenIndex += 1
-    while ( tweenIndex < len(_TweenList) and curTime >= _TweenList[tweenIndex].remainTime ):
-      tweenIndex += 1
+    # while ( tweenIndex < len(_TweenList) and curTime >= _TweenList[tweenIndex].remainTime ):
+    #   tweenIndex += 1
 
 
     if msgIndex >= len(fixMsgList) and tweenIndex >= len(_TweenList):
