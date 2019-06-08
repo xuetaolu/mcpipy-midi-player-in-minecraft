@@ -13,9 +13,9 @@ import api_motion
 # Custom Setting Here
 class Cfg(object):
   def __init__(self):
-    self.MidiFile = r'E:\minecraft 1.12.2\.minecraft\saves\CopyNinjaKaKaXi\data\functions\mid\test.mid'
-    # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\【黑乐谱】圆周率.mid'
-    # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\In the hall of the mountain king FINAL.mid'
+    # self.MidiFile = r'E:\minecraft 1.12.2\.minecraft\saves\CopyNinjaKaKaXi\data\functions\mid\test.mid'
+    self.MidiFile = r'C:\Users\dell\Desktop\膝盖\小苹果.mid'
+    # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\Lemon.mid'
     # self.MidiFile = r'C:\Users\dell\Desktop\膝盖\梁祝完整版.mid'
     # self.MidiFile = r'./mid/梦回还 - 狐妖小红娘王权篇OP.mid'
     self.RootPos  = Vec3( 32,32,0 )
@@ -445,9 +445,9 @@ if __name__ == '__main__':
 
   _TweenList.sort( key=lambda item: item.remainTime )
 
-  with open('log.txt', 'w') as f:
-    for tween in _TweenList:
-      f.write(f'time:{tween.remainTime}, p0:{tween.p0}, p1:{tween.p1}, fT:{tween.fT} \n')
+  # with open('log.txt', 'w') as f:
+  #   for tween in _TweenList:
+  #     f.write(f'time:{tween.remainTime}, p0:{tween.p0}, p1:{tween.p1}, fT:{tween.fT} \n')
             
 
   def yieldMsg():
@@ -486,10 +486,10 @@ if __name__ == '__main__':
     # dt = curTime - lastTime
     # lastTime = curTime
 
-    if msgIndex < len(fixMsgList):
-      if curTime >= fixMsgList[msgIndex].curTime:
-        fixMsg = fixMsgList[msgIndex]
-        msgIndex += 1
+    if msgIndex < len(fixMsgList) and curTime >= fixMsgList[msgIndex].curTime:
+
+      fixMsg = fixMsgList[msgIndex]
+      msgIndex += 1
 
     # if curTime >= nextTime:
     #   fixMsg     = nextFixMsg
@@ -532,6 +532,8 @@ if __name__ == '__main__':
 
     if ( tweenIndex < len(_TweenList) and curTime >= _TweenList[tweenIndex].remainTime ):
       _TweenList[tweenIndex].callback()
+      tweenIndex += 1
+    while ( tweenIndex < len(_TweenList) and curTime >= _TweenList[tweenIndex].remainTime ):
       tweenIndex += 1
 
 
